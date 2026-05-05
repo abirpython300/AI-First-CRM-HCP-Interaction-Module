@@ -1,0 +1,67 @@
+import React, { useState } from "react";
+import axios from "axios";
+
+function App() {
+  const [text, setText] = useState("");
+  const [formData, setFormData] = useState({});
+  const [status, setStatus] = useState("");
+
+  const handleSubmit = async () => {
+    try {
+      const res = await axios.post("http://127.0.0.1:8000/chat-agent", {
+        text: text,
+      });
+
+      setFormData(res.data.form_data);
+      setStatus(res.data.action);
+    } catch (err) {
+      setStatus("Error connecting to backend");
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", height: "100vh", fontFamily: "Arial" }}>
+      
+      {/* LEFT SIDE FORM */}
+      <div style={{ width: "60%", padding: "20px" }}>
+        <h2>Interaction Details (Read-only)</h2>
+
+        <input value={formData.hcp_name || ""} readOnly placeholder="HCP Name" /><br/><br/>
+        <input value={formData.interaction_type || ""} readOnly placeholder="Interaction Type" /><br/><br/>
+        
+        <textarea
+          value={formData.summary || ""}
+          readOnly
+          placeholder="Summary"
+          rows={4}
+          style={{ width: "100%" }}
+        /><br/><br/>
+
+        <input value={formData.sentiment || ""} readOnly placeholder="Sentiment" /><br/><br/>
+        <input value={formData.follow_up_action || ""} readOnly placeholder="Follow-up Action" />
+      </div>
+
+      {/* RIGHT SIDE CHAT */}
+      <div style={{ width: "40%", padding: "20px", background: "#f5f5f5" }}>
+        <h2>AI Assistant</h2>
+
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Describe interaction..."
+          style={{ width: "100%", padding: "10px" }}
+        /><br/><br/>
+
+        <button onClick={handleSubmit} style={{ padding: "10px 20px" }}>
+          Log / Update
+        </button>
+
+        <h4 style={{ marginTop: "20px" }}>System Status</h4>
+        <div>{status}</div>
+      </div>
+
+    </div>
+  );
+}
+
+export default App;
